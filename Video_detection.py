@@ -1,4 +1,7 @@
+import os
+from gtts import gTTS
 import cv2
+import gtts
 import numpy as np
 net=cv2.dnn.readNet("yolov3.weights","yolov3.cfg")
 classes=[]
@@ -10,7 +13,7 @@ cap = cv2.VideoCapture('test.mp4')
 #img=cv2.imread("dog.jpeg")
 
 while True:
-    _, img=cap.read()
+    _, img=cap.read() 
     height, width, _=img.shape
 
     blob = cv2.dnn.blobFromImage(img, 1/255, (416,416), (0,0,0), swapRB=True, crop=False)
@@ -44,6 +47,8 @@ while True:
                 boxes.append([x, y, w, h])
                 confidences.append(float(confidence))
                 class_ids.append(class_id)
+            else:
+                continue
     #print(len(boxes))
     indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
     #print(indexes.flatten())
@@ -58,6 +63,12 @@ while True:
         color = colors[i]
         cv2.rectangle(img, (x,y), (x+w, y+h), color, 2)
         cv2.putText(img, label + " " +confidence, (x, y+20), font, 2, (0,0,255), 2)
+    for i in confidences:
+        if float(confidence) >0.8:
+            language ='en'
+            t1 = gtts.gTTS(label + "IS APPROACHING")
+            t1.save("t1.mp3")
+            os.system("t1.mp3")
 
 
     cv2.imshow("Image", img)
